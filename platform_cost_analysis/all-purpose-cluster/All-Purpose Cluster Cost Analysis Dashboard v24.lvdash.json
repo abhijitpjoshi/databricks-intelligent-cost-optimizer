@@ -88,88 +88,237 @@
       "name": "executive_summary",
       "displayName": "Executive Summary Metrics",
       "queryLines": [
-        "\n",
-        "            WITH base_metrics AS (\n",
-        "              SELECT \n",
-        "                ROUND(SUM(total_cost_usd), 2) as total_cost,\n",
-        "                COUNT(DISTINCT usage_date) as days_analyzed,\n",
-        "                COUNT(DISTINCT cluster_id) as total_clusters,\n",
-        "                COUNT(DISTINCT workspace_name) as total_workspaces,\n",
-        "                COUNT(DISTINCT principal_email) as total_users,\n",
-        "                COUNT(DISTINCT node_type) as total_instance_types,\n",
-        "                ROUND(SUM(total_cost_usd) / COUNT(DISTINCT principal_email), 2) as avg_cost_per_user,\n",
-        "                ROUND(SUM(total_cost_usd) / COUNT(DISTINCT cluster_id), 2) as avg_cost_per_cluster\n",
-        "              FROM ex_dash_temp.billing_forecast.all_purpose_base\n",
-        "            ),\n",
-        "            cluster_opp AS (\n",
-        "              SELECT \n",
-        "                COUNT(*) as clusters_with_opp,\n",
-        "                SUM(CASE WHEN opportunity_priority = 'CRITICAL' THEN 1 ELSE 0 END) as critical_clusters,\n",
-        "                SUM(CASE WHEN opportunity_priority = 'HIGH' THEN 1 ELSE 0 END) as high_clusters,\n",
-        "                ROUND(SUM(validated_savings), 2) as cluster_savings\n",
-        "              FROM ex_dash_temp.billing_forecast.cluster_opportunities\n",
-        "            ),\n",
-        "            instance_opp AS (\n",
-        "              SELECT \n",
-        "                COUNT(*) as instances_with_opp,\n",
-        "                SUM(CASE WHEN opportunity_priority = 'CRITICAL' THEN 1 ELSE 0 END) as critical_instances,\n",
-        "                SUM(CASE WHEN opportunity_priority = 'HIGH' THEN 1 ELSE 0 END) as high_instances,\n",
-        "                ROUND(SUM(validated_savings), 2) as instance_savings\n",
-        "              FROM ex_dash_temp.billing_forecast.instance_opportunities\n",
-        "            ),\n",
-        "            user_opp AS (\n",
-        "              SELECT \n",
-        "                COUNT(*) as users_with_opp,\n",
-        "                ROUND(SUM(validated_savings), 2) as user_savings\n",
-        "              FROM ex_dash_temp.billing_forecast.user_opportunities\n",
-        "            ),\n",
-        "            avg_util AS (\n",
-        "              SELECT \n",
-        "                ROUND(AVG(avg_cpu_pct), 0) as avg_cpu,\n",
-        "                ROUND(AVG(avg_mem_pct), 0) as avg_mem,\n",
-        "                ROUND(AVG(telemetry_coverage_pct), 0) as avg_telemetry\n",
-        "              FROM ex_dash_temp.billing_forecast.cluster_total_cost\n",
-        "            ),\n",
-        "            top_user AS (\n",
-        "              SELECT principal_email as top_user, ROUND(total_cost_usd, 2) as top_user_cost\n",
-        "              FROM ex_dash_temp.billing_forecast.user_total_cost\n",
-        "              ORDER BY total_cost_usd DESC LIMIT 1\n",
-        "            ),\n",
-        "            top_cluster AS (\n",
-        "              SELECT cluster_name as top_cluster, ROUND(total_cost_usd, 2) as top_cluster_cost\n",
-        "              FROM ex_dash_temp.billing_forecast.cluster_total_cost\n",
-        "              ORDER BY total_cost_usd DESC LIMIT 1\n",
-        "            ),\n",
-        "            top_instance AS (\n",
-        "              SELECT instance_type as top_instance, ROUND(total_cost_usd, 2) as top_instance_cost\n",
-        "              FROM ex_dash_temp.billing_forecast.instance_total_cost\n",
-        "              ORDER BY total_cost_usd DESC LIMIT 1\n",
-        "            )\n",
-        "            SELECT \n",
-        "              b.*,\n",
-        "              c.clusters_with_opp,\n",
-        "              c.critical_clusters,\n",
-        "              c.high_clusters,\n",
-        "              c.cluster_savings,\n",
-        "              i.instances_with_opp,\n",
-        "              i.critical_instances,\n",
-        "              i.high_instances,\n",
-        "              i.instance_savings,\n",
-        "              u.users_with_opp,\n",
-        "              u.user_savings,\n",
-        "              GREATEST(c.cluster_savings, i.instance_savings, u.user_savings) as max_savings,\n",
-        "              tu.top_user,\n",
-        "              tu.top_user_cost,\n",
-        "              tc.top_cluster,\n",
-        "              tc.top_cluster_cost,\n",
-        "              ti.top_instance,\n",
-        "              ti.top_instance_cost,\n",
-        "              av.avg_cpu,\n",
-        "              av.avg_mem,\n",
-        "              av.avg_telemetry,\n",
-        "              ROUND((GREATEST(c.cluster_savings, i.instance_savings, u.user_savings) / b.total_cost) * 100, 1) as savings_pct\n",
-        "            FROM base_metrics b, cluster_opp c, instance_opp i, user_opp u, avg_util av, top_user tu, top_cluster tc, top_instance ti\n",
-        "        "
+        "WITH base_metrics AS (\n",
+        "  SELECT \n",
+        "    ROUND(SUM(total_cost_usd), 2) as total_cost,\n",
+        "    COUNT(DISTINCT usage_date) as days_analyzed,\n",
+        "    COUNT(DISTINCT cluster_id) as total_clusters,\n",
+        "    COUNT(DISTINCT workspace_name) as total_workspaces,\n",
+        "    COUNT(DISTINCT principal_email) as total_users,\n",
+        "    COUNT(DISTINCT node_type) as total_instance_types,\n",
+        "    ROUND(SUM(total_cost_usd) / COUNT(DISTINCT principal_email), 2) as avg_cost_per_user,\n",
+        "    ROUND(SUM(total_cost_usd) / COUNT(DISTINCT cluster_id), 2) as avg_cost_per_cluster\n",
+        "  FROM ex_dash_temp.billing_forecast.all_purpose_base\n",
+        "  WHERE :workspace_name = 'All' OR workspace_name = :workspace_name\n",
+        "),\n",
+        "cluster_opp AS (\n",
+        "  SELECT \n",
+        "    COUNT(*) as clusters_with_opp,\n",
+        "    SUM(CASE WHEN opportunity_priority = 'CRITICAL' THEN 1 ELSE 0 END) as critical_clusters,\n",
+        "    SUM(CASE WHEN opportunity_priority = 'HIGH' THEN 1 ELSE 0 END) as high_clusters,\n",
+        "    ROUND(SUM(validated_savings), 2) as cluster_savings\n",
+        "  FROM ex_dash_temp.billing_forecast.cluster_opportunities\n",
+        "  WHERE :workspace_name = 'All' OR workspace_name = :workspace_name\n",
+        "),\n",
+        "instance_opp AS (\n",
+        "  SELECT \n",
+        "    COUNT(*) as instances_with_opp,\n",
+        "    SUM(CASE WHEN opportunity_priority = 'CRITICAL' THEN 1 ELSE 0 END) as critical_instances,\n",
+        "    SUM(CASE WHEN opportunity_priority = 'HIGH' THEN 1 ELSE 0 END) as high_instances,\n",
+        "    ROUND(SUM(validated_savings), 2) as instance_savings\n",
+        "  FROM ex_dash_temp.billing_forecast.instance_opportunities\n",
+        "),\n",
+        "user_opp AS (\n",
+        "  SELECT \n",
+        "    COUNT(*) as users_with_opp,\n",
+        "    ROUND(SUM(validated_savings), 2) as user_savings\n",
+        "  FROM ex_dash_temp.billing_forecast.user_opportunities\n",
+        "  WHERE :workspace_name = 'All' OR primary_workspace = :workspace_name\n",
+        "),\n",
+        "avg_util AS (\n",
+        "  SELECT \n",
+        "    ROUND(AVG(avg_cpu_pct), 0) as avg_cpu,\n",
+        "    ROUND(AVG(avg_mem_pct), 0) as avg_mem,\n",
+        "    ROUND(AVG(telemetry_coverage_pct), 0) as avg_telemetry\n",
+        "  FROM ex_dash_temp.billing_forecast.cluster_total_cost\n",
+        "  WHERE :workspace_name = 'All' OR workspace_name = :workspace_name\n",
+        "),\n",
+        "top_user AS (\n",
+        "  SELECT principal_email as top_user, ROUND(total_cost_usd, 2) as top_user_cost\n",
+        "  FROM ex_dash_temp.billing_forecast.user_total_cost\n",
+        "  WHERE :workspace_name = 'All' OR primary_workspace = :workspace_name\n",
+        "  ORDER BY total_cost_usd DESC LIMIT 1\n",
+        "),\n",
+        "top_cluster AS (\n",
+        "  SELECT cluster_name as top_cluster, ROUND(total_cost_usd, 2) as top_cluster_cost\n",
+        "  FROM ex_dash_temp.billing_forecast.cluster_total_cost\n",
+        "  WHERE :workspace_name = 'All' OR workspace_name = :workspace_name\n",
+        "  ORDER BY total_cost_usd DESC LIMIT 1\n",
+        "),\n",
+        "top_instance AS (\n",
+        "  SELECT instance_type as top_instance, ROUND(total_cost_usd, 2) as top_instance_cost\n",
+        "  FROM ex_dash_temp.billing_forecast.instance_total_cost\n",
+        "  ORDER BY total_cost_usd DESC LIMIT 1\n",
+        ")\n",
+        "SELECT \n",
+        "  b.*,\n",
+        "  c.clusters_with_opp,\n",
+        "  c.critical_clusters,\n",
+        "  c.high_clusters,\n",
+        "  c.cluster_savings,\n",
+        "  i.instances_with_opp,\n",
+        "  i.critical_instances,\n",
+        "  i.high_instances,\n",
+        "  i.instance_savings,\n",
+        "  u.users_with_opp,\n",
+        "  u.user_savings,\n",
+        "  GREATEST(c.cluster_savings, i.instance_savings, u.user_savings) as max_savings,\n",
+        "  tu.top_user,\n",
+        "  tu.top_user_cost,\n",
+        "  tc.top_cluster,\n",
+        "  tc.top_cluster_cost,\n",
+        "  ti.top_instance,\n",
+        "  ti.top_instance_cost,\n",
+        "  av.avg_cpu,\n",
+        "  av.avg_mem,\n",
+        "  av.avg_telemetry,\n",
+        "--              ROUND((GREATEST(c.cluster_savings, i.instance_savings, u.user_savings) / b.total_cost) * 100, 1) as savings_pct\n",
+        "  ROUND((c.cluster_savings / b.total_cost) * 100, 1) as cluster_cost_savings_pct\n",
+        "FROM base_metrics b, cluster_opp c, instance_opp i, user_opp u, avg_util av, top_user tu, top_cluster tc, top_instance ti"
+      ],
+      "parameters": [
+        {
+          "displayName": "workspace_name",
+          "keyword": "workspace_name",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "All"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "87898ee7",
+      "displayName": "Executive Summary Metrics 1",
+      "queryLines": [
+        "WITH base_metrics AS (\n",
+        "  SELECT \n",
+        "    ROUND(SUM(total_cost_usd), 2) as total_cost,\n",
+        "    COUNT(DISTINCT usage_date) as days_analyzed,\n",
+        "    COUNT(DISTINCT cluster_id) as total_clusters,\n",
+        "    COUNT(DISTINCT workspace_name) as total_workspaces,\n",
+        "    COUNT(DISTINCT principal_email) as total_users,\n",
+        "    COUNT(DISTINCT node_type) as total_instance_types,\n",
+        "    ROUND(SUM(total_cost_usd) / COUNT(DISTINCT principal_email), 2) as avg_cost_per_user,\n",
+        "    ROUND(SUM(total_cost_usd) / COUNT(DISTINCT cluster_id), 2) as avg_cost_per_cluster\n",
+        "  FROM ex_dash_temp.billing_forecast.all_purpose_base\n",
+        "  WHERE :workspace_name = 'All' OR workspace_name = :workspace_name\n",
+        "),\n",
+        "cluster_opp AS (\n",
+        "  SELECT \n",
+        "    COUNT(*) as clusters_with_opp,\n",
+        "    SUM(CASE WHEN opportunity_priority = 'CRITICAL' THEN 1 ELSE 0 END) as critical_clusters,\n",
+        "    SUM(CASE WHEN opportunity_priority = 'HIGH' THEN 1 ELSE 0 END) as high_clusters,\n",
+        "    ROUND(SUM(validated_savings), 2) as cluster_savings\n",
+        "  FROM ex_dash_temp.billing_forecast.cluster_opportunities\n",
+        "  WHERE :workspace_name = 'All' OR workspace_name = :workspace_name\n",
+        "),\n",
+        "instance_opp AS (\n",
+        "  SELECT \n",
+        "    COUNT(*) as instances_with_opp,\n",
+        "    SUM(CASE WHEN opportunity_priority = 'CRITICAL' THEN 1 ELSE 0 END) as critical_instances,\n",
+        "    SUM(CASE WHEN opportunity_priority = 'HIGH' THEN 1 ELSE 0 END) as high_instances,\n",
+        "    ROUND(SUM(validated_savings), 2) as instance_savings\n",
+        "  FROM ex_dash_temp.billing_forecast.instance_opportunities\n",
+        "),\n",
+        "user_opp AS (\n",
+        "  SELECT \n",
+        "    COUNT(*) as users_with_opp,\n",
+        "    ROUND(SUM(validated_savings), 2) as user_savings\n",
+        "  FROM ex_dash_temp.billing_forecast.user_opportunities\n",
+        "  WHERE :workspace_name = 'All' OR primary_workspace = :workspace_name\n",
+        "),\n",
+        "avg_util AS (\n",
+        "  SELECT \n",
+        "    ROUND(AVG(avg_cpu_pct), 0) as avg_cpu,\n",
+        "    ROUND(AVG(avg_mem_pct), 0) as avg_mem,\n",
+        "    ROUND(AVG(telemetry_coverage_pct), 0) as avg_telemetry\n",
+        "  FROM ex_dash_temp.billing_forecast.cluster_total_cost\n",
+        "  WHERE :workspace_name = 'All' OR workspace_name = :workspace_name\n",
+        "),\n",
+        "top_user AS (\n",
+        "  SELECT principal_email as top_user, ROUND(total_cost_usd, 2) as top_user_cost\n",
+        "  FROM ex_dash_temp.billing_forecast.user_total_cost\n",
+        "  WHERE :workspace_name = 'All' OR primary_workspace = :workspace_name\n",
+        "  ORDER BY total_cost_usd DESC LIMIT 1\n",
+        "),\n",
+        "top_cluster AS (\n",
+        "  SELECT cluster_name as top_cluster, ROUND(total_cost_usd, 2) as top_cluster_cost\n",
+        "  FROM ex_dash_temp.billing_forecast.cluster_total_cost\n",
+        "  WHERE :workspace_name = 'All' OR workspace_name = :workspace_name\n",
+        "  ORDER BY total_cost_usd DESC LIMIT 1\n",
+        "),\n",
+        "top_instance AS (\n",
+        "  SELECT instance_type as top_instance, ROUND(total_cost_usd, 2) as top_instance_cost\n",
+        "  FROM ex_dash_temp.billing_forecast.instance_total_cost\n",
+        "  ORDER BY total_cost_usd DESC LIMIT 1\n",
+        ")\n",
+        "SELECT \n",
+        "  b.*,\n",
+        "  c.clusters_with_opp,\n",
+        "  c.critical_clusters,\n",
+        "  c.high_clusters,\n",
+        "  c.cluster_savings,\n",
+        "  i.instances_with_opp,\n",
+        "  i.critical_instances,\n",
+        "  i.high_instances,\n",
+        "  i.instance_savings,\n",
+        "  u.users_with_opp,\n",
+        "  u.user_savings,\n",
+        "  GREATEST(c.cluster_savings, i.instance_savings, u.user_savings) as max_savings,\n",
+        "  tu.top_user,\n",
+        "  tu.top_user_cost,\n",
+        "  tc.top_cluster,\n",
+        "  tc.top_cluster_cost,\n",
+        "  ti.top_instance,\n",
+        "  ti.top_instance_cost,\n",
+        "  av.avg_cpu,\n",
+        "  av.avg_mem,\n",
+        "  av.avg_telemetry,\n",
+        "--              ROUND((GREATEST(c.cluster_savings, i.instance_savings, u.user_savings) / b.total_cost) * 100, 1) as savings_pct\n",
+        "  ROUND((c.cluster_savings / b.total_cost) * 100, 1) as cluster_cost_savings_pct\n",
+        "FROM base_metrics b, cluster_opp c, instance_opp i, user_opp u, avg_util av, top_user tu, top_cluster tc, top_instance ti"
+      ],
+      "parameters": [
+        {
+          "displayName": "workspace_name",
+          "keyword": "workspace_name",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "All"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "69e4bbb5",
+      "displayName": "Active Workspace Names for Dashboard Filter",
+      "queryLines": [
+        "-- Query to populate workspace_name dropdown filter in dashboard\n",
+        "-- Use this query as the source for your dashboard parameter dropdown\n",
+        "-- Only shows workspaces that have billing data\n",
+        "SELECT 'All' as workspace_name\n",
+        "UNION ALL\n",
+        "SELECT DISTINCT workspace_name\n",
+        "FROM ex_dash_temp.billing_forecast.all_purpose_base\n",
+        "WHERE workspace_name IS NOT NULL\n",
+        "ORDER BY \n",
+        "  CASE WHEN workspace_name = 'All' THEN 0 ELSE 1 END,\n",
+        "  workspace_name ASC"
       ]
     }
   ],
@@ -213,7 +362,7 @@
           },
           "position": {
             "x": 0,
-            "y": 0,
+            "y": 1,
             "width": 2,
             "height": 3
           }
@@ -253,7 +402,7 @@
           },
           "position": {
             "x": 2,
-            "y": 0,
+            "y": 1,
             "width": 2,
             "height": 3
           }
@@ -268,8 +417,8 @@
                   "datasetName": "executive_summary",
                   "fields": [
                     {
-                      "name": "savings_pct",
-                      "expression": "`savings_pct`"
+                      "name": "cluster_cost_savings_pct",
+                      "expression": "`cluster_cost_savings_pct`"
                     }
                   ],
                   "disaggregated": true
@@ -281,20 +430,20 @@
               "widgetType": "counter",
               "encodings": {
                 "value": {
-                  "fieldName": "savings_pct",
+                  "fieldName": "cluster_cost_savings_pct",
                   "displayName": "Savings %"
                 }
               },
               "frame": {
                 "showTitle": true,
-                "title": "📈 Savings %"
+                "title": "📈 Cluster Cost Savings %"
               }
             }
           },
           "position": {
             "x": 4,
-            "y": 0,
-            "width": 2,
+            "y": 1,
+            "width": 1,
             "height": 3
           }
         },
@@ -333,7 +482,7 @@
           },
           "position": {
             "x": 0,
-            "y": 3,
+            "y": 4,
             "width": 2,
             "height": 3
           }
@@ -373,7 +522,7 @@
           },
           "position": {
             "x": 2,
-            "y": 3,
+            "y": 4,
             "width": 2,
             "height": 3
           }
@@ -413,7 +562,7 @@
           },
           "position": {
             "x": 4,
-            "y": 3,
+            "y": 4,
             "width": 2,
             "height": 3
           }
@@ -453,7 +602,7 @@
           },
           "position": {
             "x": 0,
-            "y": 6,
+            "y": 7,
             "width": 2,
             "height": 3
           }
@@ -493,7 +642,7 @@
           },
           "position": {
             "x": 2,
-            "y": 6,
+            "y": 7,
             "width": 2,
             "height": 3
           }
@@ -533,7 +682,7 @@
           },
           "position": {
             "x": 4,
-            "y": 6,
+            "y": 7,
             "width": 1,
             "height": 3
           }
@@ -573,7 +722,7 @@
           },
           "position": {
             "x": 5,
-            "y": 6,
+            "y": 7,
             "width": 1,
             "height": 3
           }
@@ -613,7 +762,7 @@
           },
           "position": {
             "x": 0,
-            "y": 9,
+            "y": 10,
             "width": 2,
             "height": 3
           }
@@ -653,7 +802,7 @@
           },
           "position": {
             "x": 2,
-            "y": 9,
+            "y": 10,
             "width": 2,
             "height": 3
           }
@@ -693,7 +842,7 @@
           },
           "position": {
             "x": 4,
-            "y": 9,
+            "y": 10,
             "width": 2,
             "height": 3
           }
@@ -761,7 +910,7 @@
           },
           "position": {
             "x": 0,
-            "y": 12,
+            "y": 13,
             "width": 6,
             "height": 8
           }
@@ -830,9 +979,150 @@
           },
           "position": {
             "x": 0,
-            "y": 20,
+            "y": 21,
             "width": 6,
             "height": 8
+          }
+        },
+        {
+          "widget": {
+            "name": "days-analysed-back-from-today",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "executive_summary",
+                  "fields": [
+                    {
+                      "name": "days_analyzed",
+                      "expression": "`days_analyzed`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "days_analyzed"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Days analysed back from today"
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 0,
+            "width": 4,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "8efde88a",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "executive_summary",
+                  "fields": [
+                    {
+                      "name": "cluster_savings",
+                      "expression": "`cluster_savings`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "cluster_savings",
+                  "displayName": "Savings %"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "📈 Cluster Cost Savings$"
+              }
+            }
+          },
+          "position": {
+            "x": 5,
+            "y": 1,
+            "width": 1,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "6ea54632",
+            "queries": [
+              {
+                "name": "dashboards/01f0c57c8cb618d594e4297069cffea8/datasets/01f0c96bcac9161680e8a5cbf90d3263_workspace_name",
+                "query": {
+                  "datasetName": "69e4bbb5",
+                  "fields": [
+                    {
+                      "name": "workspace_name",
+                      "expression": "`workspace_name`"
+                    },
+                    {
+                      "name": "workspace_name_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_dashboards/01f0c57c8cb618d594e4297069cffea8/datasets/01f0c5c12dd51c61bcd9e7b8a670cdc4_workspace_name",
+                "query": {
+                  "datasetName": "executive_summary",
+                  "parameters": [
+                    {
+                      "name": "workspace_name",
+                      "keyword": "workspace_name"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "parameterName": "workspace_name",
+                    "queryName": "parameter_dashboards/01f0c57c8cb618d594e4297069cffea8/datasets/01f0c5c12dd51c61bcd9e7b8a670cdc4_workspace_name"
+                  },
+                  {
+                    "fieldName": "workspace_name",
+                    "queryName": "dashboards/01f0c57c8cb618d594e4297069cffea8/datasets/01f0c96bcac9161680e8a5cbf90d3263_workspace_name"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 2,
+            "height": 1
           }
         }
       ],
@@ -2773,7 +3063,7 @@
           "position": {
             "x": 0,
             "y": 0,
-            "width": 3,
+            "width": 2,
             "height": 1
           }
         },
@@ -2816,14 +3106,112 @@
             }
           },
           "position": {
-            "x": 3,
+            "x": 4,
             "y": 0,
-            "width": 3,
+            "width": 2,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "0007a941",
+            "queries": [
+              {
+                "name": "dashboards/01f0c57c8cb618d594e4297069cffea8/datasets/01f0c5c12dd51c3dbcd47032a083843c_workspace_name",
+                "query": {
+                  "datasetName": "cluster_opportunities",
+                  "fields": [
+                    {
+                      "name": "workspace_name",
+                      "expression": "`workspace_name`"
+                    },
+                    {
+                      "name": "workspace_name_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "workspace_name",
+                    "queryName": "dashboards/01f0c57c8cb618d594e4297069cffea8/datasets/01f0c5c12dd51c3dbcd47032a083843c_workspace_name"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 0,
+            "width": 2,
             "height": 1
           }
         }
       ],
       "pageType": "PAGE_TYPE_CANVAS"
+    },
+    {
+      "name": "6e2a4592",
+      "displayName": "Global Filters",
+      "layout": [
+        {
+          "widget": {
+            "name": "47d4ac96",
+            "queries": [
+              {
+                "name": "dashboards/01f0c57c8cb618d594e4297069cffea8/datasets/01f0c96bcac9161680e8a5cbf90d3263_workspace_name",
+                "query": {
+                  "datasetName": "69e4bbb5",
+                  "fields": [
+                    {
+                      "name": "workspace_name",
+                      "expression": "`workspace_name`"
+                    },
+                    {
+                      "name": "workspace_name_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "workspace_name",
+                    "queryName": "dashboards/01f0c57c8cb618d594e4297069cffea8/datasets/01f0c96bcac9161680e8a5cbf90d3263_workspace_name"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "showDescription": false
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 1,
+            "height": 2
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_GLOBAL_FILTERS"
     }
   ],
   "uiSettings": {
