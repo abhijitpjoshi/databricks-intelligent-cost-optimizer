@@ -1934,8 +1934,20 @@
                       "expression": "`principal_email`"
                     },
                     {
+                      "name": "primary_workspace",
+                      "expression": "`primary_workspace`"
+                    },
+                    {
                       "name": "total_cost_usd",
                       "expression": "`total_cost_usd`"
+                    },
+                    {
+                      "name": "days_active",
+                      "expression": "`days_active`"
+                    },
+                    {
+                      "name": "unique_clusters",
+                      "expression": "`unique_clusters`"
                     },
                     {
                       "name": "avg_cpu_pct",
@@ -1946,12 +1958,48 @@
                       "expression": "`avg_mem_pct`"
                     },
                     {
+                      "name": "avg_network_mb",
+                      "expression": "`avg_network_mb`"
+                    },
+                    {
+                      "name": "total_network_gb",
+                      "expression": "`total_network_gb`"
+                    },
+                    {
+                      "name": "avg_cores",
+                      "expression": "`avg_cores`"
+                    },
+                    {
+                      "name": "avg_memory_gb",
+                      "expression": "`avg_memory_gb`"
+                    },
+                    {
+                      "name": "photon_usage_pct",
+                      "expression": "`photon_usage_pct`"
+                    },
+                    {
+                      "name": "avg_autoterm_minutes",
+                      "expression": "`avg_autoterm_minutes`"
+                    },
+                    {
+                      "name": "telemetry_coverage_pct",
+                      "expression": "`telemetry_coverage_pct`"
+                    },
+                    {
                       "name": "opportunity_priority",
                       "expression": "`opportunity_priority`"
                     },
                     {
                       "name": "recommendation",
                       "expression": "`recommendation`"
+                    },
+                    {
+                      "name": "estimated_monthly_savings",
+                      "expression": "`estimated_monthly_savings`"
+                    },
+                    {
+                      "name": "action_item",
+                      "expression": "`action_item`"
                     },
                     {
                       "name": "validated_savings",
@@ -1969,76 +2017,567 @@
                 "columns": [
                   {
                     "fieldName": "principal_email",
-                    "displayName": "User",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
                     "type": "string",
+                    "displayAs": "string",
                     "visible": true,
-                    "order": 1,
+                    "order": 100000,
+                    "title": "principal_email",
+                    "allowSearch": false,
                     "alignContent": "left",
-                    "allowSearch": false
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
+                  },
+                  {
+                    "fieldName": "primary_workspace",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 100002,
+                    "title": "primary_workspace",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
                   },
                   {
                     "fieldName": "total_cost_usd",
-                    "displayName": "Current Cost",
-                    "type": "number",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "decimal",
+                    "displayAs": "number",
                     "visible": true,
-                    "order": 2,
-                    "alignContent": "right",
+                    "order": 100003,
+                    "title": "total_cost_usd",
                     "allowSearch": false,
-                    "numberFormat": "0,0.00"
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
+                  },
+                  {
+                    "fieldName": "days_active",
+                    "numberFormat": "0",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "integer",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 100004,
+                    "title": "days_active",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
+                  },
+                  {
+                    "fieldName": "unique_clusters",
+                    "numberFormat": "0",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "integer",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 100005,
+                    "title": "unique_clusters",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
                   },
                   {
                     "fieldName": "avg_cpu_pct",
-                    "displayName": "CPU %",
-                    "type": "number",
+                    "numberFormat": "0.00",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "float",
+                    "displayAs": "number",
                     "visible": true,
-                    "order": 3,
-                    "alignContent": "right",
+                    "order": 100006,
+                    "title": "avg_cpu_pct",
                     "allowSearch": false,
-                    "numberFormat": "0.0"
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
                   },
                   {
                     "fieldName": "avg_mem_pct",
-                    "displayName": "Memory %",
-                    "type": "number",
+                    "numberFormat": "0.00",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "float",
+                    "displayAs": "number",
                     "visible": true,
-                    "order": 4,
-                    "alignContent": "right",
+                    "order": 100007,
+                    "title": "avg_mem_pct",
                     "allowSearch": false,
-                    "numberFormat": "0.0"
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
+                  },
+                  {
+                    "fieldName": "avg_network_mb",
+                    "numberFormat": "0.00",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "float",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 100008,
+                    "title": "avg_network_mb",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
+                  },
+                  {
+                    "fieldName": "total_network_gb",
+                    "numberFormat": "0.00",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "float",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 100009,
+                    "title": "total_network_gb",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
+                  },
+                  {
+                    "fieldName": "avg_cores",
+                    "numberFormat": "0.00",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "float",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 100010,
+                    "title": "avg_cores",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
+                  },
+                  {
+                    "fieldName": "avg_memory_gb",
+                    "numberFormat": "0.00",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "float",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 100011,
+                    "title": "avg_memory_gb",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
+                  },
+                  {
+                    "fieldName": "photon_usage_pct",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "decimal",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 100012,
+                    "title": "photon_usage_pct",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
+                  },
+                  {
+                    "fieldName": "avg_autoterm_minutes",
+                    "numberFormat": "0.00",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "float",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 100013,
+                    "title": "avg_autoterm_minutes",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
+                  },
+                  {
+                    "fieldName": "telemetry_coverage_pct",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "decimal",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 100014,
+                    "title": "telemetry_coverage_pct",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
                   },
                   {
                     "fieldName": "opportunity_priority",
-                    "displayName": "Priority",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
                     "type": "string",
+                    "displayAs": "string",
                     "visible": true,
-                    "order": 5,
-                    "alignContent": "center",
-                    "allowSearch": false
+                    "order": 100015,
+                    "title": "opportunity_priority",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
                   },
                   {
                     "fieldName": "recommendation",
-                    "displayName": "Recommendation",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
                     "type": "string",
+                    "displayAs": "string",
                     "visible": true,
-                    "order": 6,
+                    "order": 100016,
+                    "title": "recommendation",
+                    "allowSearch": false,
                     "alignContent": "left",
-                    "allowSearch": false
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
+                  },
+                  {
+                    "fieldName": "estimated_monthly_savings",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "decimal",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 100017,
+                    "title": "estimated_monthly_savings",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
+                  },
+                  {
+                    "fieldName": "action_item",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 100018,
+                    "title": "action_item",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
                   },
                   {
                     "fieldName": "validated_savings",
-                    "displayName": "Potential Savings",
-                    "type": "number",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "decimal",
+                    "displayAs": "number",
                     "visible": true,
-                    "order": 7,
-                    "alignContent": "right",
+                    "order": 100019,
+                    "title": "validated_savings",
                     "allowSearch": false,
-                    "numberFormat": "0,0.00"
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
                   }
                 ]
               },
-              "itemsPerPage": 15,
+              "invisibleColumns": [
+                {
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "principal_type",
+                  "type": "string",
+                  "displayAs": "string",
+                  "order": 100001,
+                  "title": "principal_type",
+                  "allowSearch": false,
+                  "alignContent": "left",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "dateTimeFormat": "DD/MM/YYYY HH:mm:ss.SSS",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "created_at",
+                  "type": "datetime",
+                  "displayAs": "datetime",
+                  "order": 100020,
+                  "title": "created_at",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                }
+              ],
+              "allowHTMLByDefault": false,
+              "itemsPerPage": 25,
+              "paginationSize": "default",
               "condensed": true,
-              "withRowNumber": true,
+              "withRowNumber": false,
               "frame": {
                 "showTitle": true,
                 "title": "👥 User Optimization Opportunities"
